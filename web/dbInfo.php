@@ -13,9 +13,19 @@
 		
 		// The item Id 
 		public $productId;
+		// The uri
 		public $uri;
+		
+		//The endpoint
 		public $endpoint;
 		
+		/*
+		* Function will return data from amazon directly to user
+		* @param string $productId 
+		* @param string $accessKey
+		* @param string $secretKey
+		*
+		*/
 		public function returnData($productId,$accessKey, $secretKey){
 			$uri = "/onca/xml";
 			$endpoint = "webservices.amazon.com";
@@ -56,51 +66,89 @@
 			$request = 'http://'.$endpoint.$uri.'?'.$canonical_query_string.'&Signature='.rawurlencode($signature);
 			//Catch the response in the $response object
 			$response = file_get_contents($request);
+			//formats the content to xml
 			$responseXml = simplexml_load_string($response);
+			// encode information to json
 			$parsedResponse = json_encode($responseXml);	
+			// returns the response to ajax call
 			echo $parsedResponse;	
+			// end the function
 			die();
 		}
+		/*
+		*
+		* Will populate the database with item
+		* @param string $hostname
+		* @param string $username
+		* @param string $password
+		* @param string $db
+		*
+		*/
 		public function addItem($hostname,$username, $password, $db){
-			$asin = mysqli_real_escape_string($_POST['addAsin']);
-			$title = mysqli_real_escape_string($_POST['addTitle']);
-			$mpn = mysqli_real_escape_string($_POST['addMpn']);
-			$price = mysqli_real_escape_string($_POST['addPrice']);
+			// Connect to database
 			$conn = new mysqli($hostname,$username, $password, $db);
-			if ($this->$conn->connect_error) {
+			
+			// Escape all the post parameters
+			$asin = htmlspecialchars($conn->real_escape_string($_POST['addAsin']));
+			$title = htmlspecialchars($conn->real_escape_string($_POST['addTitle']));
+			$mpn = htmlspecialchars($conn->real_escape_string($_POST['addMpn']));
+			$price = htmlspecialchars($conn->real_escape_string($_POST['addPrice']));
+			// Check fro connection error
+			if ($conn->connect_error) {
 	    		die("Connection failed: " . $conn->connect_error);
 			} 
-			$sql = "INSERT INTO quantum(asin, title, mpn, price) VALUES($asin,$title,$mpn,$price)";
-			if ($conn->query($sql) === TRUE) {
-				echo "success";
+			// SQL statement for inserting values to database
+			$sql = "INSERT INTO items(asin, title, mpn, price) VALUES(?,?,?,?)";
+			$stmt = $conn->prepare($sql);
+			// Add values to sql statement
+			$stmt->bind_param('ssss', $asin, $title, $mpn, $price);
+			//Executes query and checks for errors
+			if ($stmt->execute()) {
+				$conn->close();
+				return;
 			} else {
-			    echo "Error:";
+			    echo "Error:" . $conn->error;
+			    $conn->close();
 			}
-			$conn->close();
 		}
-		public function retrieveListing($hostname, $username, $password, $sb){
-			$items = array();
+		
+		/*
+		*
+		* Will retrieve database values and return a json version of data
+		* @params string $hostname
+		* @params string $username
+		* @params string $password
+		* @params string $db
+		*
+		*/
+		public function retrieveListing($hostname, $username, $password, $db){
+			// Array to store data from database
+			$items = [];
+			//Connect to database
 			$conn = new mysqli($hostname,$username, $password, $db);
 			if ($conn->connect_error) {
 	    		die("Connection failed: " . $conn->connect_error);
 			} 
-			$sql = "SELECT * FROM tableName";
-			$result = $conn->query($sql);
-			$i = 1;
-			if($result->num_rows > 0){
-				while($row == $result->fetch_assoc()){
-					$items[$i]['asin'] = $row['asin'];
-					$items[$i]['title'] = $row['title'];
-					$items[$i]['mpn'] = $row['mpn'];
-					$items[$i]['price'] = $row['price'];
-					$i++;
+			$sql = "SELECT * FROM items";
+			// Checks for results add adds them to array
+			if($result = $conn->query($sql)){
+				while($row = $result->fetch_assoc()){
+					$items[$row['asin']]['asin'] = $row['asin'];
+					$items[$row['asin']]['title'] = $row['title'];
+					$items[$row['asin']]['mpn'] = $row['mpn'];
+					$items[$row['asin']]['price'] = $row['price'];
 				}
 			}else{
 				echo "No Listings";
 			}
-			$response = json_encode($items);
+			// encode results as json 
+			$response = json_encode($items, JSON_FORCE_OBJECT);
+			// sends json to ajax call
 			echo $response;
+			// close connection to database
 			$conn->close();
+			// ends php call
+			die();
 		}
 	}
 	if(isset($_POST['itemLookup']) && isset($_POST['asinNum'])){
