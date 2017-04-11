@@ -59,6 +59,7 @@
 			$responseXml = simplexml_load_string($response);
 			$parsedResponse = json_encode($responseXml);	
 			echo $parsedResponse;	
+			die();
 		}
 		public function addItem($hostname,$username, $password, $db){
 			$asin = mysqli_real_escape_string($_POST['addAsin']);
@@ -102,11 +103,6 @@
 			$conn->close();
 		}
 	}
-		$url = parse_url(getenv("CLEARDB_DATABASE_URL"));
-		$server = $url["host"];
-		$username = $url["user"];
-		$password = $url["pass"];
-		$db = substr($url["path"], 1);
 	if(isset($_POST['itemLookup']) && isset($_POST['asinNum'])){
 		$productId = $_POST['asinNum'];
 		$accessKey = "AKIAIOWFZ4KTTJAKNLFQ";
@@ -115,11 +111,21 @@
 		$awsConnect->returnData($productId,$accessKey, $secretKey);
 	}
 	if(isset($_POST['addItemForm'])){
+		$url = parse_url(getenv("CLEARDB_DATABASE_URL"));
+		$server = $url["host"];
+		$username = $url["user"];
+		$password = $url["pass"];
+		$db = substr($url["path"], 1);
 		$awsConnect = new AwsConnect();
 		$awsConnect->addItem($server, $username, $password, $db);
 		$awsConnect->retrieveListing($server, $username, $password, $db);
 	}
 	else{
+		$url = parse_url(getenv("CLEARDB_DATABASE_URL"));
+		$server = $url["host"];
+		$username = $url["user"];
+		$password = $url["pass"];
+		$db = substr($url["path"], 1);
 		$awsConnect = new AwsConnect();
 		$awsConnect->retrieveListing($server, $username, $password, $db);
 	}
