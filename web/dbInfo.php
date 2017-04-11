@@ -58,7 +58,7 @@
 			$response = file_get_contents($request);
 			$responseXml = simplexml_load_string($response);
 			$parsedResponse = json_encode($responseXml);	
-			echo $parsedResponse;	
+			echo $responseXml;	
 		}
 		public function addItem($hostname,$username, $password, $db){
 			$asin = mysqli_real_escape_string($_POST['addAsin']);
@@ -102,8 +102,7 @@
 			$conn->close();
 		}
 	}
-	$url = parse_url(getenv("CLEARDB_DATABASE_URL"));
-			
+		$url = parse_url(getenv("CLEARDB_DATABASE_URL"));
 		$server = $url["host"];
 		$username = $url["user"];
 		$password = $url["pass"];
