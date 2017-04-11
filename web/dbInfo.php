@@ -97,7 +97,7 @@
 			}else{
 				echo "No Listings";
 			}
-			$reponse = json_encode($items);
+			$response = json_encode($items);
 			echo $response;
 			$conn->close();
 		}
