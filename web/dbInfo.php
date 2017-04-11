@@ -13,7 +13,8 @@
 		
 		// The item Id 
 		public $productId;
-		
+		public $uri;
+		public $endpoint;
 		
 		public function returnData($productId,$accessKey, $secretKey){
 			$uri = "/onca/xml";
