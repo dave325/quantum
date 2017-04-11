@@ -58,7 +58,7 @@
 			$response = file_get_contents($request);
 			$responseXml = simplexml_load_string($response);
 			$parsedResponse = json_encode($responseXml);	
-			echo $responseXml;	
+			echo $parsedResponse;	
 		}
 		public function addItem($hostname,$username, $password, $db){
 			$asin = mysqli_real_escape_string($_POST['addAsin']);
