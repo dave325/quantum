@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.7.17, for Win64 (x86_64)
 --
--- Host: us-cdbr-iron-east-03.cleardb.net    Database: heroku_57f9b17215aa12e
+-- Host: dbUrl   Database: dbName
 -- ------------------------------------------------------
 -- Server version	5.5.45-log
 
