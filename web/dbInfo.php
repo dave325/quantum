@@ -153,8 +153,8 @@
 	}
 	if(isset($_POST['itemLookup']) && isset($_POST['asinNum'])){
 		$productId = $_POST['asinNum'];
-		$accessKey = "AKIAIOWFZ4KTTJAKNLFQ";
-		$secretKey = "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";
+		$accessKey = key;
+		$secretKey = key;
 		$awsConnect = new AwsConnect();
 		$awsConnect->returnData($productId,$accessKey, $secretKey);
 	}
